@@ -16,11 +16,11 @@
                 From plumbers to electricians, painters to carpenters - find the right professional for your project.
             </p>
             <div class="d-flex gap-3 mb-4">
-                <a href="{% url 'services' %}" class="btn btn-primary btn-lg">
+                <a href="{% url 'usermgmt:services' %}" class="btn btn-primary btn-lg">
                     <i class="bi bi-search me-2"></i>Find Services
                 </a>
                 {% if not user.is_authenticated %}
-                    <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg">
+                    <a href="{% url 'usermgmt:register' %}" class="btn btn-outline-light btn-lg">
                         <i class="bi bi-person-plus me-2"></i>Join as Provider
                     </a>
                 {% endif %}
@@ -52,7 +52,7 @@
                 <div class="card bg-darker border-custom">
                     <div class="card-body">
                         <h5 class="card-title text-primary">Quick Service Search</h5>
-                        <form action="{% url 'services' %}" method="get" class="mt-3">
+                        <form action="{% url 'usermgmt:services' %}" method="get" class="mt-3">
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control" name="q" 
                                        placeholder="What service do you need?" 
@@ -97,7 +97,7 @@
         <div class="row">
             {% for category in categories %}
                 <div class="col-md-4 col-lg-2 mb-4">
-                    <a href="{% url 'services' %}?category={{ category.id }}" 
+                    <a href="{% url 'usermgmt:services' %}?category={{ category.id }}" 
                        class="text-decoration-none">
                         <div class="card service-card text-center h-100">
                             <div class="card-body">
@@ -112,7 +112,7 @@
         </div>
         
         <div class="text-center mt-4">
-            <a href="{% url 'services' %}" class="btn btn-outline-primary">
+            <a href="{% url 'usermgmt:services' %}" class="btn btn-outline-primary">
                 View All Categories <i class="bi bi-arrow-right ms-2"></i>
             </a>
         </div>
@@ -159,7 +159,7 @@
                                 </div>
                             </div>
                             <div class="card-footer bg-transparent">
-                                <a href="{% url 'service_detail' service.id %}" class="btn btn-outline-primary w-100">
+                                <a href="{% url 'usermgmt:service_detail' service.id %}" class="btn btn-outline-primary w-100">
                                     <i class="bi bi-eye me-2"></i>View Details
                                 </a>
                             </div>
@@ -169,7 +169,7 @@
             </div>
             
             <div class="text-center mt-4">
-                <a href="{% url 'services' %}" class="btn btn-primary">
+                <a href="{% url 'usermgmt:services' %}" class="btn btn-primary">
                     View All Services <i class="bi bi-arrow-right ms-2"></i>
                 </a>
             </div>
@@ -239,10 +239,10 @@
                         Join thousands of satisfied customers and service providers on ServiceFinder
                     </p>
                     <div class="d-flex justify-content-center gap-3">
-                        <a href="{% url 'register' %}?role=customer" class="btn btn-light btn-lg">
+                        <a href="{% url 'usermgmt:register' %}?role=customer" class="btn btn-light btn-lg">
                             <i class="bi bi-person me-2"></i>Find Services
                         </a>
-                        <a href="{% url 'register' %}?role=provider" class="btn btn-outline-light btn-lg">
+                        <a href="{% url 'usermgmt:register' %}?role=provider" class="btn btn-outline-light btn-lg">
                             <i class="bi bi-briefcase me-2"></i>Offer Services
                         </a>
                     </div>
