@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ServiceFinder - Find Local Services Near You{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row align-items-center py-5">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold text-primary mb-4">
+                Find Local Services <span class="text-light">Near You</span>
+            </h1>
+            <p class="lead mb-4">
+                Connect with trusted local service providers for all your needs. 
+                From plumbers to electricians, painters to carpenters - find the right professional for your project.
+            </p>
+            <div class="d-flex gap-3 mb-4">
+                <a href="{% url 'services' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-search me-2"></i>Find Services
+                </a>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-person-plus me-2"></i>Join as Provider
+                    </a>
+                {% endif %}
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="row text-center mt-5">
+                <div class="col-3">
+                    <div class="h3 text-primary mb-0">{{ stats.total_providers }}+</div>
+                    <small class="text-muted">Providers</small>
+                </div>
+                <div class="col-3">
+                    <div class="h3 text-success mb-0">{{ stats.total_services }}+</div>
+                    <small class="text-muted">Services</small>
+                </div>
+                <div class="col-3">
+                    <div class="h3 text-info mb-0">{{ stats.total_bookings }}+</div>
+                    <small class="text-muted">Bookings</small>
+                </div>
+                <div class="col-3">
+                    <div class="h3 text-warning mb-0">{{ stats.total_reviews }}+</div>
+                    <small class="text-muted">Reviews</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="text-center">
+                <i class="bi bi-tools display-1 text-primary mb-4"></i>
+                <div class="card bg-darker border-custom">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">Quick Service Search</h5>
+                        <form action="{% url 'services' %}" method="get" class="mt-3">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" name="q" 
+                                       placeholder="What service do you need?" 
+                                       value="{{ request.GET.q }}">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="button" class="btn btn-outline-primary w-100 mb-2" 
+                                            id="get-location-btn">
+                                        <i class="bi bi-geo-alt"></i> Use My Location
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <select class="form-select" name="category">
+                                        <option value="">All Categories</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <input type="hidden" id="user-lat" name="lat">
+                            <input type="hidden" id="user-lng" name="lng">
+                        </form>
+                        <div id="location-status" class="mt-2 text-center"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Categories -->
+    <section class="py-5">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold">Popular Service Categories</h2>
+            <p class="lead text-muted">Browse services by category</p>
+        </div>
+        
+        <div class="row">
+            {% for category in categories %}
+                <div class="col-md-4 col-lg-2 mb-4">
+                    <a href="{% url 'services' %}?category={{ category.id }}" 
+                       class="text-decoration-none">
+                        <div class="card service-card text-center h-100">
+                            <div class="card-body">
+                                <i class="bi bi-{{ category.icon|default:'tools' }} display-4 text-primary mb-3"></i>
+                                <h6 class="card-title">{{ category.name }}</h6>
+                                <small class="text-muted">{{ category.description|truncatewords:8 }}</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'services' %}" class="btn btn-outline-primary">
+                View All Categories <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Featured Services -->
+    {% if top_services %}
+        <section class="py-5">
+            <div class="text-center mb-5">
+                <h2 class="display-6 fw-bold">Top Rated Services</h2>
+                <p class="lead text-muted">Highly rated professionals in your area</p>
+            </div>
+            
+            <div class="row">
+                {% for service in top_services %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card service-card h-100">
+                            {% if service.image %}
+                                <img src="{{ service.image.url }}" class="card-img-top" 
+                                     style="height: 200px; object-fit: cover;" alt="{{ service.name }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ service.name }}</h5>
+                                <p class="card-text text-muted">{{ service.description|truncatewords:15 }}</p>
+                                <div class="mb-2">
+                                    <span class="badge bg-secondary">{{ service.category.name }}</span>
+                                    <span class="badge bg-info">{{ service.experience_years }} years exp.</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="rating-stars">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= service.provider.provider_profile.average_rating %}
+                                                <i class="bi bi-star-fill"></i>
+                                            {% else %}
+                                                <i class="bi bi-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <small class="text-muted">({{ service.provider.provider_profile.total_reviews }})</small>
+                                    </div>
+                                    <div class="service-price">${{ service.price_per_hour }}/hr</div>
+                                </div>
+                                <div class="text-muted mb-3">
+                                    <i class="bi bi-person"></i> {{ service.provider.get_full_name }}
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <a href="{% url 'service_detail' service.id %}" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-eye me-2"></i>View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'services' %}" class="btn btn-primary">
+                    View All Services <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </section>
+    {% endif %}
+
+    <!-- How It Works -->
+    <section class="py-5">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold">How It Works</h2>
+            <p class="lead text-muted">Get connected with local service providers in 3 simple steps</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 text-center mb-4">
+                <div class="card bg-darker border-custom h-100">
+                    <div class="card-body">
+                        <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px;">
+                            <i class="bi bi-search display-6 text-white"></i>
+                        </div>
+                        <h5 class="card-title">1. Search Services</h5>
+                        <p class="card-text text-muted">
+                            Browse or search for the service you need. Filter by location, rating, and price.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="card bg-darker border-custom h-100">
+                    <div class="card-body">
+                        <div class="rounded-circle bg-success d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px;">
+                            <i class="bi bi-calendar-check display-6 text-white"></i>
+                        </div>
+                        <h5 class="card-title">2. Book Service</h5>
+                        <p class="card-text text-muted">
+                            Choose your preferred date and time. Describe your requirements and confirm booking.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <div class="card bg-darker border-custom h-100">
+                    <div class="card-body">
+                        <div class="rounded-circle bg-warning d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px;">
+                            <i class="bi bi-star-fill display-6 text-dark"></i>
+                        </div>
+                        <h5 class="card-title">3. Rate & Review</h5>
+                        <p class="card-text text-muted">
+                            After service completion, rate your experience and help others make informed decisions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    {% if not user.is_authenticated %}
+        <section class="py-5">
+            <div class="card bg-primary text-white text-center">
+                <div class="card-body py-5">
+                    <h2 class="display-6 fw-bold mb-4">Ready to Get Started?</h2>
+                    <p class="lead mb-4">
+                        Join thousands of satisfied customers and service providers on ServiceFinder
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'register' %}?role=customer" class="btn btn-light btn-lg">
+                            <i class="bi bi-person me-2"></i>Find Services
+                        </a>
+                        <a href="{% url 'register' %}?role=provider" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-briefcase me-2"></i>Offer Services
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize geolocation on home page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-detect location if user clicks the location button
+        const locationBtn = document.getElementById('get-location-btn');
+        if (locationBtn) {
+            locationBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                ServiceFinder.getCurrentLocation();
+            });
+        }
+    });
+</script>
+{% endblock %}

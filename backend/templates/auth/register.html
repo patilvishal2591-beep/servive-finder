@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - ServiceFinder{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center py-5">
+        <div class="col-md-8 col-lg-6">
+            <div class="card bg-darker border-custom">
+                <div class="card-header text-center">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-plus text-primary me-2"></i>
+                        Join ServiceFinder
+                    </h3>
+                    <p class="text-muted mb-0">Create your account to get started</p>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Role Selection -->
+                        <div class="mb-4">
+                            <label class="form-label">I want to:</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="role" id="customer" 
+                                               value="customer" {% if request.GET.role == 'customer' or not request.GET.role %}checked{% endif %} required>
+                                        <label class="form-check-label" for="customer">
+                                            <div class="card bg-transparent border-primary h-100">
+                                                <div class="card-body text-center">
+                                                    <i class="bi bi-search display-6 text-primary mb-2"></i>
+                                                    <h6>Find Services</h6>
+                                                    <small class="text-muted">Book local service providers</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="role" id="provider" 
+                                               value="provider" {% if request.GET.role == 'provider' %}checked{% endif %} required>
+                                        <label class="form-check-label" for="provider">
+                                            <div class="card bg-transparent border-success h-100">
+                                                <div class="card-body text-center">
+                                                    <i class="bi bi-briefcase display-6 text-success mb-2"></i>
+                                                    <h6>Offer Services</h6>
+                                                    <small class="text-muted">Provide services to customers</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Basic Information -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="first_name" name="first_name" 
+                                           placeholder="Enter your first name" required>
+                                    <div class="invalid-feedback">
+                                        Please provide your first name.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="last_name" name="last_name" 
+                                           placeholder="Enter your last name" required>
+                                    <div class="invalid-feedback">
+                                        Please provide your last name.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       placeholder="Choose a unique username" required>
+                                <div class="invalid-feedback">
+                                    Please choose a username.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="Enter your email address" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid email address.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-telephone"></i>
+                                </span>
+                                <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                       placeholder="Enter your phone number" required>
+                                <div class="invalid-feedback">
+                                    Please provide your phone number.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Password Fields -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="password1" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-lock"></i>
+                                        </span>
+                                        <input type="password" class="form-control" id="password1" name="password1" 
+                                               placeholder="Create a password" required minlength="8">
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword1">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <div class="invalid-feedback">
+                                            Password must be at least 8 characters long.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="password2" class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-lock-fill"></i>
+                                        </span>
+                                        <input type="password" class="form-control" id="password2" name="password2" 
+                                               placeholder="Confirm your password" required minlength="8">
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword2">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <div class="invalid-feedback">
+                                            Passwords must match.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Provider-specific fields -->
+                        <div id="provider-fields" style="display: none;">
+                            <hr class="my-4">
+                            <h6 class="text-success mb-3">
+                                <i class="bi bi-briefcase me-2"></i>Service Provider Information
+                            </h6>
+                            
+                            <div class="mb-3">
+                                <label for="business_name" class="form-label">Business Name (Optional)</label>
+                                <input type="text" class="form-control" id="business_name" name="business_name" 
+                                       placeholder="Enter your business name">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="bio" class="form-label">Bio/Description</label>
+                                <textarea class="form-control" id="bio" name="bio" rows="3" 
+                                         placeholder="Tell customers about your services and experience"></textarea>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="experience_years" class="form-label">Years of Experience</label>
+                                        <select class="form-select" id="experience_years" name="experience_years">
+                                            <option value="">Select experience</option>
+                                            <option value="1">1 year</option>
+                                            <option value="2">2 years</option>
+                                            <option value="3">3 years</option>
+                                            <option value="5">5 years</option>
+                                            <option value="10">10+ years</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="service_category" class="form-label">Primary Service Category</label>
+                                        <select class="form-select" id="service_category" name="service_category">
+                                            <option value="">Select category</option>
+                                            {% for category in categories %}
+                                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Terms and Conditions -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="text-primary">Terms of Service</a> 
+                                and <a href="#" class="text-primary">Privacy Policy</a>
+                            </label>
+                            <div class="invalid-feedback">
+                                You must agree to the terms and conditions.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">
+                        Already have an account? 
+                        <a href="{% url 'login' %}" class="text-primary text-decoration-none fw-bold">
+                            Login here
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const customerRadio = document.getElementById('customer');
+        const providerRadio = document.getElementById('provider');
+        const providerFields = document.getElementById('provider-fields');
+        
+        // Toggle provider fields based on role selection
+        function toggleProviderFields() {
+            if (providerRadio.checked) {
+                providerFields.style.display = 'block';
+                // Make provider fields required
+                document.getElementById('bio').required = true;
+                document.getElementById('experience_years').required = true;
+                document.getElementById('service_category').required = true;
+            } else {
+                providerFields.style.display = 'none';
+                // Make provider fields optional
+                document.getElementById('bio').required = false;
+                document.getElementById('experience_years').required = false;
+                document.getElementById('service_category').required = false;
+            }
+        }
+        
+        customerRadio.addEventListener('change', toggleProviderFields);
+        providerRadio.addEventListener('change', toggleProviderFields);
+        
+        // Initialize on page load
+        toggleProviderFields();
+        
+        // Password visibility toggles
+        document.getElementById('togglePassword1').addEventListener('click', function() {
+            const passwordField = document.getElementById('password1');
+            const toggleIcon = this.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        });
+        
+        document.getElementById('togglePassword2').addEventListener('click', function() {
+            const passwordField = document.getElementById('password2');
+            const toggleIcon = this.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        });
+        
+        // Password confirmation validation
+        const password1 = document.getElementById('password1');
+        const password2 = document.getElementById('password2');
+        
+        function validatePasswordMatch() {
+            if (password1.value !== password2.value) {
+                password2.setCustomValidity('Passwords do not match');
+            } else {
+                password2.setCustomValidity('');
+            }
+        }
+        
+        password1.addEventListener('input', validatePasswordMatch);
+        password2.addEventListener('input', validatePasswordMatch);
+    });
+</script>
+{% endblock %}
