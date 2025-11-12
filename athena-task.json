@@ -1,0 +1,463 @@
+{
+  "story-id": "WBMDTO-3622",
+  "type": "story",
+  "title": "Development of a Python-Based Web Application: Local Service Finder",
+  "description": [
+    "Category: Web Application Development, Local Services Marketplace, User Management System, Geo-based Search Functionality.",
+    "Purpose: Build a user-friendly web platform for customers to find, book, and review local services (plumbers, electricians, painters, carpenters, etc.) and for service providers to list offerings and manage bookings, based on proximity and ratings. Application must be responsive for mobile.",
+    "User Types:",
+    "  a. Customer: Browse, search, and book nearby services. Show services in a separate section if distance >10km. Rate and review services. Login required. Show service reaching time. Fake payment gateway for online/cash option.",
+    "  b. Service Provider: Login required. Register and list services (name, description, category, experience). Specify services and geolocation. Manage bookings and view ratings.",
+    "Key Requirements: Create multiple fake records for each role and other tables.",
+    "  a. Use Docker container for application setup. Must run on Windows and Ubuntu.",
+    "  b. User Authentication: Secure registration/login for both roles. Role-based dashboard.",
+    "  c. Service Listing & Management (Provider): Input form for service details, upload profile image/documents (optional), manage bookings.",
+    "  d. Service Browsing & Booking (Customer): Search nearby services via geolocation, filter by category/experience/rating, book services, view history, leave reviews.",
+    "  e. Ratings & Reviews: Customers can rate after booking. Average rating shown.",
+    "  f. Location-Based Search: Detect or input location. Show only nearby providers within radius.",
+    "Frontend Features: Clean, intuitive layout. Responsive design. Dark theme. Dashboard per role. Forms with validation. Google Maps/OpenStreetMap integration.",
+    "Technology Stack: Backend - Django, MySQL, Django REST Framework, Token Auth. Frontend - HTML5, CSS3 (dark theme), JS6, Bootstrap, Django templates.",
+    "Optional Integrations: Google Maps/OpenStreetMap, Email notifications, Firebase/Twilio for SMS (optional)."
+  ],
+  "subtasks": [
+    {
+      "id": "ST-1",
+      "description": "Backend: Set up Django project, configure Docker for cross-platform (Windows/Ubuntu) compatibility, and initialize MySQL database. Create fake records for users and other tables.",
+      "status": "completed",
+      "acceptance-criteria": [
+        "Django project runs in Docker on both Windows and Ubuntu.",
+        "MySQL database is initialized and accessible from Django.",
+        "Multiple fake records exist for each user role and related tables.",
+        "Docker setup includes all dependencies and clear instructions."
+      ],
+      "implementation-details": {
+        "files-modified": [
+          {
+            "path": "backend/servicefinder_backend/settings.py",
+            "changes": [
+              "Added environment variable support with python-dotenv",
+              "Configured MySQL database connection with fallback to SQLite",
+              "Added usermgmt and servicemgmt apps to INSTALLED_APPS"
+            ]
+          },
+          {
+            "path": "backend/Dockerfile",
+            "changes": [
+              "Created Dockerfile for Django application",
+              "Configured Python 3.11 base image with dependencies",
+              "Set up Gunicorn for production deployment"
+            ]
+          },
+          {
+            "path": "docker-compose.yml",
+            "changes": [
+              "Created Docker Compose configuration",
+              "Set up MySQL 8.0 service with persistent volume",
+              "Configured Django web service with environment variables",
+              "Ensured cross-platform compatibility for Windows/Ubuntu"
+            ]
+          },
+          {
+            "path": "backend/.env",
+            "changes": [
+              "Created environment configuration file",
+              "Set MySQL connection parameters",
+              "Configured Django settings for Docker deployment"
+            ]
+          },
+          {
+            "path": "backend/requirements.txt",
+            "changes": [
+              "Added Django, gunicorn, mysqlclient, python-dotenv dependencies"
+            ]
+          },
+          {
+            "path": "backend/usermgmt/",
+            "changes": [
+              "Created user management Django app",
+              "Added management command for fake data population",
+              "Implemented customer and provider user creation"
+            ]
+          },
+          {
+            "path": "backend/servicemgmt/",
+            "changes": [
+              "Created service management Django app structure"
+            ]
+          },
+          {
+            "path": "README.md",
+            "changes": [
+              "Created comprehensive setup documentation",
+              "Added Docker instructions for Windows and Ubuntu",
+              "Included troubleshooting guide and project structure"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ST-2",
+      "description": "Backend: Implement user authentication (registration, login) for Customer and Service Provider roles with token-based authentication and role-based dashboard access.",
+      "status": "completed",
+      "acceptance-criteria": [
+        "Secure registration and login endpoints for both roles.",
+        "Token-based authentication implemented.",
+        "Role-based dashboard access enforced.",
+        "Unit tests for authentication and role logic."
+      ],
+      "implementation-details": {
+        "files-modified": [
+          {
+            "path": "backend/requirements.txt",
+            "changes": [
+              "Added Django REST Framework and JWT authentication dependencies",
+              "Added Pillow for image handling"
+            ]
+          },
+          {
+            "path": "backend/servicefinder_backend/settings.py",
+            "changes": [
+              "Added REST Framework and JWT authentication configuration",
+              "Configured custom User model",
+              "Added media files configuration for image uploads"
+            ]
+          },
+          {
+            "path": "backend/usermgmt/models.py",
+            "changes": [
+              "Created custom User model with role-based functionality",
+              "Implemented CustomerProfile and ServiceProviderProfile models",
+              "Added ServiceCategory and ProviderService models",
+              "Added geolocation fields and profile management"
+            ]
+          },
+          {
+            "path": "backend/usermgmt/serializers.py",
+            "changes": [
+              "Created registration and login serializers with validation",
+              "Implemented profile serializers for both user roles",
+              "Added password change and service management serializers"
+            ]
+          },
+          {
+            "path": "backend/usermgmt/views.py",
+            "changes": [
+              "Implemented registration and login endpoints with JWT tokens",
+              "Created role-based dashboard views with access control",
+              "Added profile management and service CRUD operations",
+              "Implemented password change and logout functionality"
+            ]
+          },
+          {
+            "path": "backend/usermgmt/permissions.py",
+            "changes": [
+              "Created custom permissions for role-based access control",
+              "Implemented IsCustomer, IsProvider, and IsOwnerOrReadOnly permissions"
+            ]
+          },
+          {
+            "path": "backend/usermgmt/urls.py",
+            "changes": [
+              "Configured URL patterns for authentication endpoints",
+              "Added role-based dashboard and profile management URLs"
+            ]
+          },
+          {
+            "path": "backend/servicefinder_backend/urls.py",
+            "changes": [
+              "Included usermgmt URLs in main URL configuration",
+              "Added media files serving for development"
+            ]
+          },
+          {
+            "path": "backend/usermgmt/admin.py",
+            "changes": [
+              "Registered custom User model with enhanced admin interface",
+              "Added admin interfaces for profiles and service categories"
+            ]
+          },
+          {
+            "path": "backend/usermgmt/tests.py",
+            "changes": [
+              "Created comprehensive unit tests for authentication",
+              "Implemented tests for role-based access control",
+              "Added tests for registration, login, and dashboard functionality"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ST-3",
+      "description": "Backend: Develop RESTful APIs for service listing, management, booking, ratings, reviews, and location-based search. Integrate geolocation logic and fake payment gateway.",
+      "status": "completed",
+      "acceptance-criteria": [
+        "APIs for service listing, booking, ratings, reviews, and location-based search are functional.",
+        "Geolocation logic filters providers within a radius and separates >10km results.",
+        "Fake payment gateway supports online/cash options.",
+        "Unit tests for all endpoints and business logic."
+      ],
+      "implementation-details": {
+        "files-modified": [
+          {
+            "path": "backend/servicemgmt/models.py",
+            "changes": [
+              "Created ServiceBooking model with comprehensive booking management",
+              "Implemented Review model with detailed rating system",
+              "Added Payment model with fake payment gateway simulation",
+              "Created ServiceAvailability model for provider scheduling",
+              "Added ServiceImage model for service photos",
+              "Implemented Notification model for user notifications",
+              "Added geolocation fields and distance calculation methods"
+            ]
+          },
+          {
+            "path": "backend/servicemgmt/serializers.py",
+            "changes": [
+              "Created comprehensive serializers for all service management models",
+              "Implemented ServiceSearchSerializer with geolocation parameters",
+              "Added ServiceWithDistanceSerializer for location-based results",
+              "Created validation logic for bookings, reviews, and payments",
+              "Implemented distance calculation using Haversine formula",
+              "Added dashboard and statistics serializers"
+            ]
+          },
+          {
+            "path": "backend/servicemgmt/views.py",
+            "changes": [
+              "Implemented ServiceSearchView with geolocation filtering",
+              "Created booking management APIs with status transitions",
+              "Added review and rating system APIs",
+              "Implemented fake payment processing with online/cash options",
+              "Created notification management system",
+              "Added dashboard statistics and analytics views",
+              "Implemented role-based access control and permissions"
+            ]
+          },
+          {
+            "path": "backend/servicemgmt/urls.py",
+            "changes": [
+              "Created comprehensive URL patterns for all service APIs",
+              "Added endpoints for search, booking, reviews, payments",
+              "Implemented notification and dashboard routes"
+            ]
+          },
+          {
+            "path": "backend/servicemgmt/admin.py",
+            "changes": [
+              "Created comprehensive admin interfaces for all models",
+              "Added filtering, searching, and bulk actions",
+              "Implemented custom admin actions for notifications"
+            ]
+          },
+          {
+            "path": "backend/servicefinder_backend/urls.py",
+            "changes": [
+              "Added servicemgmt URLs to main URL configuration"
+            ]
+          },
+          {
+            "path": "backend/servicemgmt/tests.py",
+            "changes": [
+              "Created comprehensive unit tests for all models",
+              "Implemented API tests for all endpoints",
+              "Added tests for geolocation logic and payment processing",
+              "Created permission and authentication tests",
+              "Added test coverage for booking workflow and notifications"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ST-4",
+      "description": "Frontend: Implement responsive UI using Django templates, HTML5, CSS3 (dark theme), JS6, and Bootstrap. Integrate Google Maps/OpenStreetMap for geolocation. Implement dashboards, forms, and validation.",
+      "status": "completed",
+      "acceptance-criteria": [
+        "Responsive UI for mobile and desktop.",
+        "Dark theme applied throughout.",
+        "Dashboards for Customer and Provider roles.",
+        "All forms have validation.",
+        "Geolocation map integration functional."
+      ],
+      "implementation-details": {
+        "files-modified": [
+          {
+            "path": "backend/servicefinder_backend/settings.py",
+            "changes": [
+              "Updated TEMPLATES configuration to include templates directory",
+              "Added STATICFILES_DIRS configuration for static files",
+              "Enhanced static files serving for development"
+            ]
+          },
+          {
+            "path": "backend/templates/base.html",
+            "changes": [
+              "Created responsive base template with dark theme",
+              "Integrated Bootstrap 5.3.2 with dark theme support",
+              "Added Bootstrap Icons and Leaflet CSS/JS for maps",
+              "Implemented navigation with role-based menu items",
+              "Added message display system and footer"
+            ]
+          },
+          {
+            "path": "backend/static/css/style.css",
+            "changes": [
+              "Implemented comprehensive dark theme CSS variables",
+              "Created responsive design with mobile-first approach",
+              "Styled service cards, forms, and dashboard components",
+              "Added animations and hover effects",
+              "Implemented rating stars and status badges styling"
+            ]
+          },
+          {
+            "path": "backend/static/js/main.js",
+            "changes": [
+              "Implemented geolocation functionality with HTML5 API",
+              "Integrated Leaflet maps with OpenStreetMap tiles",
+              "Created service search and filtering functionality",
+              "Added booking modal and form handling",
+              "Implemented rating system and notifications"
+            ]
+          },
+          {
+            "path": "backend/usermgmt/template_views.py",
+            "changes": [
+              "Created template-based views for all user interactions",
+              "Implemented home, authentication, and dashboard views",
+              "Added service listing, detail, and management views",
+              "Created booking management and profile views",
+              "Integrated with existing API serializers for data handling"
+            ]
+          },
+          {
+            "path": "backend/usermgmt/urls.py",
+            "changes": [
+              "Added URL patterns for template-based views",
+              "Maintained existing API endpoints alongside frontend routes",
+              "Organized URLs for authentication, services, and bookings"
+            ]
+          },
+          {
+            "path": "backend/servicefinder_backend/urls.py",
+            "changes": [
+              "Updated main URL configuration to include frontend routes",
+              "Added static files serving for development",
+              "Organized API and template URL patterns"
+            ]
+          },
+          {
+            "path": "backend/templates/home.html",
+            "changes": [
+              "Created responsive homepage with hero section",
+              "Implemented service categories and featured services display",
+              "Added quick search functionality with geolocation",
+              "Created 'How It Works' section and call-to-action areas"
+            ]
+          },
+          {
+            "path": "backend/templates/auth/login.html",
+            "changes": [
+              "Created responsive login form with validation",
+              "Added password visibility toggle functionality",
+              "Implemented demo account information display",
+              "Added form validation and error handling"
+            ]
+          },
+          {
+            "path": "backend/templates/auth/register.html",
+            "changes": [
+              "Created comprehensive registration form with role selection",
+              "Implemented dynamic provider-specific fields",
+              "Added password confirmation validation",
+              "Created responsive design with form validation"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ST-5",
+      "description": "Testing: Implement unit and integration tests for backend and frontend. Ensure test coverage for authentication, service management, booking, reviews, and geolocation.",
+      "status": "completed",
+      "acceptance-criteria": [
+        "Unit and integration tests for backend and frontend.",
+        "Test coverage includes authentication, service management, booking, reviews, and geolocation.",
+        "Test coverage report generated."
+      ],
+      "implementation-details": {
+        "files-modified": [
+          {
+            "path": "backend/tests/",
+            "changes": [
+              "Created comprehensive test directory structure",
+              "Added __init__.py files for test packages",
+              "Organized tests into unit, integration, and frontend categories"
+            ]
+          },
+          {
+            "path": "backend/tests/utils/factories.py",
+            "changes": [
+              "Created test data factories for all models",
+              "Implemented UserFactory, ServiceCategoryFactory, ProviderServiceFactory",
+              "Added ServiceBookingFactory, ReviewFactory, PaymentFactory",
+              "Created NotificationFactory and ServiceAvailabilityFactory",
+              "Implemented TestDataFactory for complete test scenarios"
+            ]
+          },
+          {
+            "path": "backend/tests/integration/test_booking_workflow.py",
+            "changes": [
+              "Created comprehensive integration tests for booking workflow",
+              "Implemented end-to-end booking process tests",
+              "Added geolocation integration tests",
+              "Created notification system integration tests",
+              "Tested booking cancellation and rejection workflows"
+            ]
+          },
+          {
+            "path": "backend/tests/frontend/test_template_views.py",
+            "changes": [
+              "Created frontend tests for Django template views",
+              "Implemented authentication template tests",
+              "Added dashboard template tests with role-based access",
+              "Created service and booking template tests",
+              "Added responsive design and JavaScript functionality tests"
+            ]
+          },
+          {
+            "path": "backend/tests/utils/test_runner.py",
+            "changes": [
+              "Created custom Django test runner with coverage reporting",
+              "Implemented test data management utilities",
+              "Added test metrics collection and reporting",
+              "Created command-line interface for running specific test suites"
+            ]
+          },
+          {
+            "path": "backend/requirements.txt",
+            "changes": [
+              "Added coverage>=7.0,<8.0 for test coverage reporting"
+            ]
+          },
+          {
+            "path": "backend/test_coverage_report.md",
+            "changes": [
+              "Created comprehensive test coverage documentation",
+              "Documented test structure and categories",
+              "Added test execution instructions and best practices",
+              "Included coverage goals and metrics"
+            ]
+          },
+          {
+            "path": "backend/.env",
+            "changes": [
+              "Updated USE_SQLITE=True for test database configuration"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
