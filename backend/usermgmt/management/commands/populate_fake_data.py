@@ -126,22 +126,36 @@ class Command(BaseCommand):
                 service = ProviderService.objects.filter(provider=provider).first()
                 
                 if service:
+                    from datetime import datetime, timedelta
+                    booking_date = datetime.now() + timedelta(days=random.randint(1, 30))
+                    
                     booking, created = ServiceBooking.objects.get_or_create(
                         customer=customer,
                         service=service,
                         defaults={
+                            'provider': service.provider,
+                            'booking_date': booking_date,
+                            'service_address': customer.address or 'Sample Address',
                             'status': random.choice(['pending', 'confirmed', 'completed']),
-                            'total_amount': service.base_price,
-                            'notes': f'Sample booking {i+1}',
+                            'quoted_price': service.base_price,
+                            'special_instructions': f'Sample booking {i+1}',
                         }
                     )
                     
                     if created and booking.status == 'completed':
                         # Create a review for completed bookings
+                        rating = random.randint(3, 5)
                         Review.objects.get_or_create(
                             booking=booking,
                             defaults={
-                                'rating': random.randint(3, 5),
+                                'customer': customer,
+                                'provider': service.provider,
+                                'service': service,
+                                'rating': rating,
+                                'quality_rating': rating,
+                                'punctuality_rating': rating,
+                                'communication_rating': rating,
+                                'value_rating': rating,
                                 'comment': f'Great service! Very professional and timely.',
                             }
                         )
